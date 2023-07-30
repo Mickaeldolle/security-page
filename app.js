@@ -3,11 +3,37 @@ const app = express();
 const auth = require("./auth");
 const usersDataBase = require("./users_db.json");
 const path = require("path");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
 
-app.use(express.static(path.join(__dirname, "pages"))).use(express.json());
+const oneDay = 1000 * 60 * 60 * 24;
+
+const user = {
+  username: "normaluser@gmail.com",
+  password: "123",
+};
+
+app
+  .use(cookieParser())
+  .use(
+    session({
+      secret: "zdada5azdinad_5azdoin:dazd$azd!",
+      saveUninitialized: true,
+      resave: false,
+      cookie: { maxAge: oneDay },
+    })
+  )
+  .use(express.urlencoded({ extended: true }))
+  .use(express.static(path.join(__dirname, "pages")))
+  .use(express.json());
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/pages/index.html");
+  session = req.session;
+  if (session.userId) {
+    res.send("Welcome user !!");
+  } else {
+    res.sendFile(__dirname + "/pages/index.html");
+  }
 });
 
 app.get("/connexion", (req, res) => {
@@ -19,6 +45,12 @@ app.get("/admin", auth.authorisation, (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  // ------------- Utilisation de la session pour l'authentification
+  if (req.body.username) {
+  }
+
+  // ------------- Utilisation du token pour l'authentification
+  /*
   let User = req.body;
   let founduser = usersDataBase.find((user) => user.email === User.email);
   if (!founduser) {
@@ -36,6 +68,7 @@ app.post("/login", (req, res) => {
       });
     }
   }
+  */
 });
 
 module.exports = app;
