@@ -13,7 +13,7 @@ submit.addEventListener("click", (e) => {
     password: passwordValue,
   };
 
-  fetch("http://localhost:3000/login", {
+  fetch("http://localhost:4000/login", {
     method: "POST",
     body: JSON.stringify(user),
     headers: {
@@ -21,27 +21,30 @@ submit.addEventListener("click", (e) => {
     },
   })
     .then((response) => response.json())
-    .then((data) => sessionStorage.setItem("token", JSON.stringify(data)))
+    .then((data) => {
+      document.cookie = `token=${data._token}`;
+      document.cookie = `userId=${data.userId}`;
+    })
     .catch((err) => console.log("Erreur de requete au serveur | :", err));
 });
 
-secretBtn.addEventListener("click", () => {
-  fetch("http://localhost:3000/admin", {
-    headers: {
-      "Content-Type": "text/html",
-      userId: JSON.parse(sessionStorage.getItem("token")).userId,
-      Authorization: `Bearer ${
-        JSON.parse(sessionStorage.getItem("token"))._token
-      }`,
-    },
-  })
-    .then((res) => res.text())
-    .then((html) => {
-      console.log(html);
-    })
-    .catch((err) => console.log(err));
-});
+// secretBtn.addEventListener("click", () => {
+//   fetch("http://localhost:3000/admin", {
+//     headers: {
+//       "Content-Type": "text/html",
+//       userId: JSON.parse(sessionStorage.getItem("token")).userId,
+//       Authorization: `Bearer ${
+//         JSON.parse(sessionStorage.getItem("token"))._token
+//       }`,
+//     },
+//   })
+//     .then((res) => res.text())
+//     .then((html) => {
+//       console.log(html);
+//     })
+//     .catch((err) => console.log(err));
+// });
 
-deconnexionBtn.addEventListener("click", () => {
-  sessionStorage.clear();
-});
+// deconnexionBtn.addEventListener("click", () => {
+//   sessionStorage.clear();
+// });

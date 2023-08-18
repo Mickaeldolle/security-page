@@ -3,72 +3,35 @@ const app = express();
 const auth = require("./auth");
 const usersDataBase = require("./users_db.json");
 const path = require("path");
-const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const routerView = require("./src/router/router");
+const routerUser = require("./src/router/user");
 
-const oneDay = 1000 * 60 * 60 * 24;
-
-const user = {
-  username: "normaluser@gmail.com",
-  password: "123",
-};
+app.set("view engine", "ejs");
+app.set("views", "views");
 
 app
-  .use(cookieParser())
-  .use(
-    session({
-      secret: "zdada5azdinad_5azdoin:dazd$azd!",
-      saveUninitialized: true,
-      resave: false,
-      cookie: { maxAge: oneDay },
-    })
-  )
-  .use(express.urlencoded({ extended: true }))
-  .use(express.static(path.join(__dirname, "pages")))
-  .use(express.json());
+  .use(express.static(path.join(__dirname, "public")))
+  .use(express.json())
+  .use(cookieParser());
 
-app.get("/", (req, res) => {
-  session = req.session;
-  if (session.userId) {
-    res.send("Welcome user !!");
-  } else {
-    res.sendFile(__dirname + "/pages/index.html");
-  }
+app.use(routerView);
+app.use(routerUser);
+
+// Middleware de connexion !!
+
+// app.use((req, res, next) => {
+//   const { token, userId } = req.cookies;
+//   let authorizedUser = usersDataBase.find((user) => user._id === userId);
+//   if (!authorizedUser) {
+//     res.redirect("/connexion");
+//   } else if (authorizedUser.profil != "admin") {
+//     console.log("vous n'avez pas les droits");
+//   } else {
+//     next();
+//   }
+// });
+
+app.listen(4000, () => {
+  console.log(`Server on port 4000`);
 });
-
-app.get("/connexion", (req, res) => {
-  res.sendFile(__dirname + "/pages/connexion.html");
-});
-
-app.get("/admin", auth.authorisation, (req, res) => {
-  res.sendFile(__dirname + "/pages/secret.html");
-});
-
-app.post("/login", (req, res) => {
-  // ------------- Utilisation de la session pour l'authentification
-  if (req.body.username) {
-  }
-
-  // ------------- Utilisation du token pour l'authentification
-  /*
-  let User = req.body;
-  let founduser = usersDataBase.find((user) => user.email === User.email);
-  if (!founduser) {
-    res
-      .status(404)
-      .json({ error: "Aucun compte n'a été trouvé dans la base de donnée" });
-  } else {
-    let index = usersDataBase.findIndex((user) => user.email === User.email);
-    if (User.password !== usersDataBase[index].password) {
-      res.json({ err: "Le mot de passe ne correspond a aucune adresse mail" });
-    } else {
-      res.status(200).json({
-        userId: usersDataBase[index]._id,
-        _token: usersDataBase[index].token,
-      });
-    }
-  }
-  */
-});
-
-module.exports = app;

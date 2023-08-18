@@ -1,4 +1,5 @@
 const usersDataBase = require("./users_db.json");
+const cookieParser = require("cookie-parser");
 
 exports.authorisation = (req, res, next) => {
   // console.log(req.headers);
@@ -16,5 +17,17 @@ exports.authorisation = (req, res, next) => {
       res.status(200);
       next();
     }
+  }
+};
+
+exports.admin = (req, res, next) => {
+  const { token, userId } = req.cookies;
+  let authorizedUser = usersDataBase.find((user) => user._id === userId);
+  if (!authorizedUser) {
+    res.redirect("/connexion");
+  } else if (authorizedUser.profil != "admin") {
+    console.log("non auhorisé");
+  } else {
+    next();
   }
 };
