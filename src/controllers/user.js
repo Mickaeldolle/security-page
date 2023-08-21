@@ -1,21 +1,24 @@
 const usersDataBase = require("../../users_db.json");
+
 exports.login = (req, res) => {
+  console.log(req.body);
   // ------------- Utilisation du token pour l'authentification
-  let User = req.body;
-  let founduser = usersDataBase.find((user) => user.email === User.email);
-  if (!founduser) {
+  let userConnexion = req.body;
+  let validUser = usersDataBase.find(
+    (user) =>
+      user.email === userConnexion.email &&
+      user.password === userConnexion.password
+  );
+
+  // ------------- On vérifie que l'utilisateur est valide !
+  if (!validUser) {
     res
-      .status(404)
+      .status(401)
       .json({ error: "Aucun compte n'a été trouvé dans la base de donnée" });
   } else {
-    let index = usersDataBase.findIndex((user) => user.email === User.email);
-    if (User.password !== usersDataBase[index].password) {
-      res.json({ err: "Le mot de passe ne correspond a aucune adresse mail" });
-    } else {
-      res.status(200).json({
-        userId: usersDataBase[index]._id,
-        _token: usersDataBase[index].token,
-      });
-    }
+    res.status(200).json({
+      userId: validUser._id,
+      token: validUser.token,
+    });
   }
 };

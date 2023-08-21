@@ -16,7 +16,10 @@
         <input type="submit" value="Connexion" />
         <button class="deconnexion">Se déconnecté</button>
     </form>
-    <script src="js/index.js"></script>
+    <% if(isAdmin) {%>
+        <a href="/admin">Voir les codes d'accès</a>
+        <%}%>
+            <script src="js/index.js"></script>
 </body>
 
 </html>
